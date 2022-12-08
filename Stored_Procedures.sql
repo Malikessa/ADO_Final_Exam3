@@ -3,11 +3,22 @@ CREATE PROCEDURE sp_ListOfPosts
 AS
 BEGIN
 	select * from Posts order by PostDate
-	select * from Comments
+	
 END
 GO
 
 exec sp_ListOfPosts
+
+CREATE PROCEDURE sp_ListOfComments
+AS
+BEGIN
+	select * from Comments
+	
+END
+GO
+
+exec sp_ListOfComments
+
 
 CREATE PROCEDURE sp_CreatePost
 	@PostContent varchar(255),
@@ -74,10 +85,10 @@ AS
 BEGIN
 	update Comments set
 	CommentContent=@CommentContent,
-	CommentById=@CommentById,
-	CommentByName=@CommentByName,
+	CommentedById=@CommentById,
+	CommentedByName=@CommentByName,
 	PostID=@PostID,
-	CommentDate=@CommentDate,
+	CommentDate=@CommentDate
 	where Id=@Id
 END
 GO
@@ -88,6 +99,8 @@ CREATE PROCEDURE sp_DeletePost
 	@Id int
 AS
 BEGIN
+	delete from Reactions where ReactedToPost=@Id
+	delete from Comments where PostId=@Id
 	delete from Posts where Id=@Id
 END
 GO
@@ -110,12 +123,13 @@ CREATE PROCEDURE sp_UpVote
 	@Reaction varchar(50)
 AS
 BEGIN
+	update Posts set Likes += 1 where Id=@ReactedToPost
 	insert into Reactions values
 	(@ReactedBy,@ReactedToPost,@Reaction)
 END
 GO
 
-exec sp_UpVote
+exec sp_UpVote  @ReactedBy=1,@ReactedToPost=2,@Reaction='like'
 
 CREATE PROCEDURE sp_DownVote
 	@ReactedBy int,
@@ -123,6 +137,7 @@ CREATE PROCEDURE sp_DownVote
 	@Reaction varchar(50)
 AS
 BEGIN
+	update Posts set Dislikes += 1 where Id=@ReactedToPost
 	insert into Reactions values
 	(@ReactedBy,@ReactedToPost,@Reaction)
 END
