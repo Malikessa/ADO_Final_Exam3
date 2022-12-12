@@ -7,7 +7,7 @@ BEGIN
 END
 GO
 
-exec sp_ListOfPosts
+
 
 CREATE PROCEDURE sp_ListOfComments
 AS
@@ -17,24 +17,22 @@ BEGIN
 END
 GO
 
-exec sp_ListOfComments
+
 
 
 CREATE PROCEDURE sp_CreatePost
 	@PostContent varchar(255),
 	@AuthorID int,
-	@AuthorName varchar(50),
-	@PostDate Date,
-	@Likes int,
-	@Dislikes int
+	@AuthorName varchar(50)
+	
 AS
 BEGIN
 	insert into Posts values
-	(@PostContent,@AuthorID,@AuthorName,@PostDate,@Likes,@Dislikes)
+	(@PostContent,@AuthorID,@AuthorName,GETDATE(),0,0)
 END
 GO
 
-exec sp_CreatePost
+
 
 CREATE PROCEDURE sp_CreateComment
 	@CommentContent varchar(255),
@@ -49,14 +47,13 @@ BEGIN
 END
 GO
 
-exec sp_CreateComment
 
 CREATE PROCEDURE sp_EditPost
-	@Id int,
+	@PostId int,
 	@PostContent varchar(255),
 	@AuthorID int,
 	@AuthorName varchar(50),
-	@PostDate Date,
+	
 	@Likes int,
 	@Dislikes int
 AS
@@ -65,14 +62,14 @@ BEGIN
 	PostContent=@PostContent,
 	AuthorID=@AuthorID,
 	AuthorName=@AuthorName,
-	PostDate=@PostDate,
+	
 	Likes=@Likes,
 	Dislikes=@Dislikes
-	where Id=@Id
+	where Id=@PostId AND AuthorID=@AuthorID
 END
 GO
 
-exec sp_EditPost
+exec sp_EditPost @PostId=3,@PostContent='777777777',@AuthorID=1,@AuthorName='Ghulam Essa',@Likes=0,@Dislikes=0
 
 CREATE PROCEDURE sp_EditComment
 	@Id int,
@@ -93,19 +90,18 @@ BEGIN
 END
 GO
 
-exec sp_EditComment
+
 
 CREATE PROCEDURE sp_DeletePost
-	@Id int
+	@PostId int,
+	@UserId int
 AS
 BEGIN
-	delete from Reactions where ReactedToPost=@Id
-	delete from Comments where PostId=@Id
-	delete from Posts where Id=@Id
+	delete from Reactions where ReactedToPost=@PostId
+	delete from Comments where PostId=@PostId
+	delete from Posts where Id=@PostId AND AuthorID=@UserId
 END
 GO
-
-exec sp_DeletePost
 
 CREATE PROCEDURE sp_DeleteComment
 	@Id int
@@ -115,7 +111,7 @@ BEGIN
 END
 GO
 
-exec sp_DeleteComment
+
 
 CREATE PROCEDURE sp_UpVote
 	@ReactedBy int,
@@ -143,4 +139,3 @@ BEGIN
 END
 GO
 
-exec sp_DownVote
