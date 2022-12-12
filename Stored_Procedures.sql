@@ -23,12 +23,13 @@ GO
 CREATE PROCEDURE sp_CreatePost
 	@PostContent varchar(255),
 	@AuthorID int,
-	@AuthorName varchar(50)
+	@AuthorName varchar(50),
+	@PostDate Date
 	
 AS
 BEGIN
 	insert into Posts values
-	(@PostContent,@AuthorID,@AuthorName,GETDATE(),0,0)
+	(@PostContent,@AuthorID,@AuthorName,@PostDate,0,0)
 END
 GO
 
@@ -51,25 +52,17 @@ GO
 CREATE PROCEDURE sp_EditPost
 	@PostId int,
 	@PostContent varchar(255),
-	@AuthorID int,
-	@AuthorName varchar(50),
+	@AuthorID int
 	
-	@Likes int,
-	@Dislikes int
 AS
 BEGIN
 	update Posts set
-	PostContent=@PostContent,
-	AuthorID=@AuthorID,
-	AuthorName=@AuthorName,
-	
-	Likes=@Likes,
-	Dislikes=@Dislikes
+	PostContent=@PostContent
 	where Id=@PostId AND AuthorID=@AuthorID
 END
 GO
 
-exec sp_EditPost @PostId=3,@PostContent='777777777',@AuthorID=1,@AuthorName='Ghulam Essa',@Likes=0,@Dislikes=0
+exec sp_EditPost @PostId=6,@PostContent='88888',@AuthorID=2
 
 CREATE PROCEDURE sp_EditComment
 	@Id int,
@@ -125,7 +118,7 @@ BEGIN
 END
 GO
 
-exec sp_UpVote  @ReactedBy=1,@ReactedToPost=2,@Reaction='like'
+--exec sp_UpVote  @ReactedBy=1,@ReactedToPost=2,@Reaction='like'
 
 CREATE PROCEDURE sp_DownVote
 	@ReactedBy int,
